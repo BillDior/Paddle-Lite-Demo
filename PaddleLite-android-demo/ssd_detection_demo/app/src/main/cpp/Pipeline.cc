@@ -14,13 +14,12 @@
 
 #include "Pipeline.h"
 
-Detector::Detector(const std::string &modelDir, const std::string &labelPath,
-                   const int cpuThreadNum, const std::string &cpuPowerMode,
-                   int inputWidth, int inputHeight,
-                   const std::vector<float> &inputMean,
-                   const std::vector<float> &inputStd, float scoreThreshold)
+Detector::Detector(const std::string &modelDir, const int cpuThreadNum,
+                   const std::string &cpuPowerMode, int inputWidth,
+                   int inputHeight, const std::vector<float> &inputMean,
+                   const std::vector<float> &inputStd)
     : inputWidth_(inputWidth), inputHeight_(inputHeight), inputMean_(inputMean),
-      inputStd_(inputStd), scoreThreshold_(scoreThreshold) {
+      inputStd_(inputStd) {
   paddle::lite_api::MobileConfig config;
   config.set_model_from_file(modelDir + "/model.nb");
   config.set_threads(cpuThreadNum);
@@ -28,8 +27,8 @@ Detector::Detector(const std::string &modelDir, const std::string &labelPath,
   predictor_ =
       paddle::lite_api::CreatePaddlePredictor<paddle::lite_api::MobileConfig>(
           config);
-  labelList_ = LoadLabelList(labelPath);
-  colorMap_ = GenerateColorMap(labelList_.size());
+  // labelList_ = LoadLabelList(labelPath);
+  // colorMap_ = GenerateColorMap(labelList_.size());
 }
 
 std::vector<std::string> Detector::LoadLabelList(const std::string &labelPath) {
@@ -117,27 +116,25 @@ void Detector::Predict(const cv::Mat &rgbaImage, std::vector<RESULT> *results,
   t = GetCurrentTime();
   Preprocess(rgbaImage);
   *preprocessTime = GetElapsedTime(t);
-  LOGD("Detector postprocess costs %f ms", *preprocessTime);
+  printf("Detector postprocess costs %f ms", *preprocessTime);
 
   t = GetCurrentTime();
   predictor_->Run();
   *predictTime = GetElapsedTime(t);
-  LOGD("Detector predict costs %f ms", *predictTime);
+  printf("Detector predict costs %f ms", *predictTime);
 
   t = GetCurrentTime();
   Postprocess(results);
   *postprocessTime = GetElapsedTime(t);
-  LOGD("Detector postprocess costs %f ms", *postprocessTime);
+  printf("Detector postprocess costs %f ms", *postprocessTime);
 }
 
-Pipeline::Pipeline(const std::string &modelDir, const std::string &labelPath,
-                   const int cpuThreadNum, const std::string &cpuPowerMode,
-                   int inputWidth, int inputHeight,
-                   const std::vector<float> &inputMean,
-                   const std::vector<float> &inputStd, float scoreThreshold) {
-  detector_.reset(new Detector(modelDir, labelPath, cpuThreadNum, cpuPowerMode,
-                               inputWidth, inputHeight, inputMean, inputStd,
-                               scoreThreshold));
+Pipeline::Pipeline(const std::string &modelDir, const int cpuThreadNum,
+                   const std::string &cpuPowerMode, int inputWidth,
+                   int inputHeight, const std::vector<float> &inputMean,
+                   const std::vector<float> &inputStd) {
+  detector_.reset(new Detector(modelDir, cpuThreadNum, cpuPowerMode, inputWidth,
+                               inputHeight, inputMean, inputStd));
 }
 
 void Pipeline::VisualizeResults(const std::vector<RESULT> &results,

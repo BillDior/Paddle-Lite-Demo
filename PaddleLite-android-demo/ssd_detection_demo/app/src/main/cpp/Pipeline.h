@@ -16,8 +16,8 @@
 
 #include "Utils.h"
 #include "paddle_api.h"
-#include <EGL/egl.h>
-#include <GLES2/gl2.h>
+//#include <EGL/egl.h>
+//#include <GLES2/gl2.h>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -37,11 +37,10 @@ struct RESULT {
 
 class Detector {
 public:
-  explicit Detector(const std::string &modelDir, const std::string &labelPath,
-                    const int cpuThreadNum, const std::string &cpuPowerMode,
-                    int inputWidth, int inputHeight,
-                    const std::vector<float> &inputMean,
-                    const std::vector<float> &inputStd, float scoreThreshold);
+  explicit Detector(const std::string &modelDir, const int cpuThreadNum,
+                    const std::string &cpuPowerMode, int inputWidth,
+                    int inputHeight, const std::vector<float> &inputMean,
+                    const std::vector<float> &inputStd);
 
   void Predict(const cv::Mat &rgbImage, std::vector<RESULT> *results,
                double *preprocessTime, double *predictTime,
@@ -66,10 +65,10 @@ private:
 
 class Pipeline {
 public:
-  Pipeline(const std::string &modelDir, const std::string &labelPath,
-           const int cpuThreadNum, const std::string &cpuPowerMode,
-           int inputWidth, int inputHeight, const std::vector<float> &inputMean,
-           const std::vector<float> &inputStd, float scoreThreshold);
+  Pipeline(const std::string &modelDir, const int cpuThreadNum,
+           const std::string &cpuPowerMode, int inputWidth, int inputHeight,
+           const std::vector<float> &inputMean,
+           const std::vector<float> &inputStd);
 
   bool Process(cv::Mat &rgbaImage, std::string savedImagePath);
 

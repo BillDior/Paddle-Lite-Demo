@@ -9,17 +9,23 @@ cmake_minimum_required(VERSION 3.4.1)
 # the relative paths to its source code. You can define multiple libraries, and
 # CMake builds them for you. Gradle automatically packages shared libraries with
 # your APK.
+SET(CMAKE_SYSTEM_NAME Android)
 
-set(PaddleLite_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../PaddleLite")
+set(ANDROID_NDK "/Users/diaoshuzhen/Library/android-ndk-r17c")
+SET(CMAKE_C_COMPILER "${ANDROID_NDK}/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-gcc")
+SET(CMAKE_CXX_COMPILER "${ANDROID_NDK}/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-g++")
+
+set (CMAKE_ANDROID_NDK ANDOIRD_NDK)
+set(PaddleLite_DIR "${CMAKE_CURRENT_SOURCE_DIR}/PaddleLite")
 include_directories(${PaddleLite_DIR}/cxx/include)
 
-set(OpenCV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../OpenCV/sdk/native/jni")
+set(OpenCV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/OpenCV/sdk/native/jni/abi-arm64-v8a")
 find_package(OpenCV REQUIRED)
 message(STATUS "OpenCV libraries: ${OpenCV_LIBS}")
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 set(CMAKE_CXX_FLAGS
-    "${CMAKE_CXX_FLAGS} -ffast-math -Ofast -Os -DNDEBUG -fno-exceptions -fomit-frame-pointer -fno-asynchronous-unwind-tables -fno-unwind-tables"
+    "${CMAKE_CXX_FLAGS} -std=c++11 -ffast-math -Ofast -Os -DNDEBUG -fno-exceptions -fomit-frame-pointer -fno-asynchronous-unwind-tables -fno-unwind-tables"
 )
 set(CMAKE_CXX_FLAGS
     "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden -fdata-sections -ffunction-sections"
@@ -27,19 +33,19 @@ set(CMAKE_CXX_FLAGS
 set(CMAKE_SHARED_LINKER_FLAGS
     "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--gc-sections -Wl,-z,nocopyreloc")
 
-add_library(
+add_executable(
   # Sets the name of the library.
-  Native
+  main 
   # Sets the library as a shared library.
-  SHARED
+  #SHARED
   # Provides a relative path to your source file(s).
-  Native.cc Pipeline.cc Utils.cc)
+  main.cc Pipeline.cc Utils.cc)
 
-find_library(
+#find_library(
   # Sets the name of the path variable.
-  log-lib
+#  log-lib
   # Specifies the name of the NDK library that you want CMake to locate.
-  log)
+#  log)
 
 add_library(
   # Sets the name of the library.
@@ -65,11 +71,11 @@ set_target_properties(
 
 target_link_libraries(
   # Specifies the target library.
-  Native
+  main
   paddle_light_api_shared
-  jnigraphics
+  #jnigraphics
   ${OpenCV_LIBS}
-  GLESv2
-  EGL
-  ${log-lib}
+  #GLESv2
+  #EGL
+  #${log-lib}
   )
